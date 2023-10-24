@@ -37,5 +37,4 @@ ggplot(melted_df, aes(x = Année, y = value, color = variable, linetype = type))
   annotate("rect", xmin = 2010, xmax = 2012, ymin = 5, ymax = 16, fill = "grey", alpha = 0.2) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-p + geom_text(data = subset(melted_df, Année %in% range(Année)), aes(label = value), 
-              hjust = c(1, 0), vjust = -0.5, nudge_x = c(-0.2, 0.2))
+geom_text(vjust = -0.5, hjust = 0.5, size = 3) +
