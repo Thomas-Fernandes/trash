@@ -14,14 +14,26 @@ combined_df <- rbind(proportions_df1, proportions_df2, proportions_df3)
 melted_df <- melt(combined_df, id.vars = c("Année", "type"))
 
 # Tracer le graphique combiné
-ggplot(melted_df, aes(x = Année, y = value, color = variable)) +
+# Tracer le graphique combiné avec des améliorations visuelles
+ggplot(melted_df, aes(x = Année, y = value, color = variable, linetype = type)) +
   geom_line(size = 1.5) +
-  labs(x = "Années", y = "Proportions", color = "Légende") +
+  labs(x = "Années", y = "Proportions", color = "Légende", linetype = "Type") +
   ggtitle("Titre du graphique combiné") +
   scale_color_manual(values = c(
     "Prop_ZPN_en_ZGN" = "#E89E0B",
     "Prop_ZGN_en_ZPN" = "#0F417A"
   )) +
-  theme(legend.position = "bottom", plot.title = element_text(size = 10.5)) +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted")) +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(size = 14, hjust = 0.5, face = "bold"),
+        axis.title = element_text(size = 12, face = "bold"),
+        axis.text = element_text(size = 10),
+        legend.title = element_text(size = 10, face = "bold"),
+        legend.text = element_text(size = 9)) +
   facet_wrap(~type, ncol = 1, scales = "free_y") +
-  ylim(5, 16)
+  ylim(5, 16) +
+  annotate("text", x = 2010, y = 15, label = "Annotations personnalisées", size = 4, color = "black") +
+  annotate("rect", xmin = 2010, xmax = 2012, ymin = 5, ymax = 16, fill = "grey", alpha = 0.2) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
