@@ -1,37 +1,57 @@
-library(reshape2)
+library(readr)
+library(dplyr)
 library(ggplot2)
+library(plotly)
+library(writexl)
 
-# Suppose que vous avez trois dataframes nommées proportions_df1, proportions_df2 et proportions_df3
+#----------------------#
+# Chargement des bases #
+#----------------------#
 
-# Rassembler les dataframes
-proportions_df1$type <- "Type 1"
-proportions_df2$type <- "Type 2"
-proportions_df3$type <- "Type 3"
+bases_infractions <- c("2016.RDATA", "2017.RDATA", "2018.RDATA", "2019.RDATA", "2020.RDATA")
 
-combined_df <- rbind(proportions_df1, proportions_df2, proportions_df3)
+for(i in 1:length(bases_infractions)){
+  load(bases_infractions[i])
+  print(paste("Chargement des fichiers : ", (i/length(bases_infractions)*100), "%"))
+}
 
-# Utiliser la fonction melt pour remodeler le dataframe
-melted_df <- melt(combined_df, id.vars = c("Année", "type"))
+#----------------------#
+# Création de la matrice carré #
+#----------------------#
 
-# Tracer le graphique combiné
-# Tracer le graphique combiné avec des améliorations visuelles
-# Code existant...
+# Le nom des colonnes et des lignes est le même, il s'agit de la taille de l'unité urbaine
+#0-Rural
+#1-Unités urbaines de 2 000 à 4 999 habitants
+#2-Unités urbaines de 5 000 à 9 999 habitants
+#3-Unités urbaines de 10 000 à 19 999 habitants
+#4-Unités urbaines de 20 000 à 49 999 habitants
+#5-Unités urbaines de 50 000 à 99 999 habitants
+#6-Unités urbaines de 100 000 à 199 999 habitants
+#7-Unités urbaines de 200 000 à 1 999 999 habitants
+#8-Agglomération de Paris
 
-# Ajouter des étiquettes aux points de données
-graph <- ggplot(melted_df, aes(x = Année, y = value, color = variable)) +
-  geom_line(size = 1) +
-  labs(x = "Années", y = "Proportions (en %)", color = "") +
-  ggtitle("Évolution des proportions d'enregistrements d'infractions entre Zone Police Nationale et Zone Gendarmerie Nationale") +
-  scale_color_manual(values = c(
-    "Prop_ZPN_en_ZGN" = "#E89E0B",
-    "Prop_ZGN_en_ZPN" = "#0F417A"),
-    labels = c(
-      "Prop_ZPN_en_ZGN" = "Part des infractions enregistrées par la\nGendarmerie mais commises en zone Police",
-      "Prop_ZGN_en_ZPN" = "Part des infractions enregistrées par la\nPolice mais commises en zone Gendarmerie"
-    )) +
-  theme(legend.position = "bottom", plot.title = element_text(size = 9.5)) +
-  facet_wrap(~type, ncol = 1, scales = "free_y") +
-  ylim(5, 16) +
-  geom_text(data = melted_df, aes(label = paste0(round(value, 1), "%")), hjust = 0.5, vjust = -0.5, size = 3, show.legend = FALSE)
 
-print(graph)
+
+create_matrix <- function(base) {
+  matrice <- data.frame(
+    "0-Rural" = 0,
+    "1-Unités urbaines de 2 000 à 4 999 habitants" = 0,
+    "2-Unités urbaines de 5 000 à 9 999 habitants" = 0,
+    "3-Unités urbaines de 10 000 à 19 999 habitants" = 0,
+    "4-Unités urbaines de 20 000 à 49 999 habitants" = 0,
+    "5-Unités urbaines de 50 000 à 99 999 habitants" = 0,
+    "6-Unités urbaines de 100 000 à 199 999 habitants" = 0,
+    "7-Unités urbaines de 200 000 à 1 999 999 habitants" = 0,
+    "8-Agglomération de Paris" = 0,
+    row.names = c("0-Rural", "1-Unités urbaines de 2 000 à 4 999 habitants", "2-Unités urbaines de 5 000 à 9 999 habitants", "3-Unités urbaines de 10 000 à 19 999 habitants", "4-Unités urbaines de 20 000 à 49 999 habitants", "5-Unités urbaines de 50 000 à 99 999 habitants", "6-Unités urbaines de 100 000 à 199 999 habitants", "7-Unités urbaines de 200 000 à 1 999 999 habitants", "8-Agglomération de Paris")
+  )
+  counts <- table(base$TUU_COMMISSION, base$SAME)
+
+  #Peuplement de la matrice
+  for(i in 1:nrow(matrice)){
+    for(j in 1:ncol(matrice)){
+      matrice[i,j] <- counts[i,j]
+    }
+  }  
+  return(matrice)
+}
