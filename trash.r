@@ -31,4 +31,5 @@ graph <- ggplot(melted_df, aes(x = Année, y = value, color = variable)) +
     )) +
   theme(legend.position = "bottom", plot.title = element_text(size = 9.5)) +
   facet_wrap(~type, ncol = 1, scales = "free_y") +
-  ylim(5, 16)
+  ylim(5, 16) +
+  geom_text(aes(label = label), vjust = -0.5, hjust = 0.5, size = 3, position = position_dodge(width = 0.9))
