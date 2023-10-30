@@ -66,11 +66,19 @@ create_matrix <- function(base) {
   return(matrice)
 }
 
-> dep.voi
-$`01`
-[1] "01" "38" "39" "69" "71" "73" "74"
-
-dep.voi_df <- data.frame(
-  departement = rep(names(dep.voi), sapply(dep.voi, length)),
-  voisin = unlist(dep.voi)
-)
+for (i in 1:nrow(data)) {
+  dept_commission <- as.character(data$DEPT_COMMISSION[i])
+  dept_service <- as.character(data$DEPT_SERV[i])
+  print(dept_commission)
+  print(dept_service)
+  if(!is.na(dept_commission) && dept_commission != "" && !is.na(dept_service) && dept_service != "") {
+    if (dept_commission == dept_service) {
+      matrice_dep[dept_commission, dept_commission] <- as.numeric(matrice_dep[dept_commission, dept_commission] + 1)
+      print(matrice_dep[dept_commission, dept_commission])
+    } else {
+      if(dept_commission %in% sorted_dep && dept_service %in% sorted_dep) {
+        matrice_dep[dept_service, dept_commission] <- as.numeric(matrice_dep[dept_service, dept_commission] + 1)
+      }
+    }
+  }
+}
