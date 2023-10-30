@@ -82,3 +82,31 @@ for (i in 1:nrow(data)) {
     }
   }
 }
+
+
+
+
+
+
+
+# Créer une matrice vide
+matrice_dep <- matrix(0, nrow = length(sorted_dep), ncol = length(sorted_dep), dimnames = list(sorted_dep, sorted_dep))
+
+# Utiliser apply pour éviter les boucles
+apply(data, 1, function(row) {
+  dept_commission <- as.character(row["DEPT_COMMISSION"])
+  dept_service <- as.character(row["DEPT_SERV"])
+  
+  if (!is.na(dept_commission) && dept_commission != "" && !is.na(dept_service) && dept_service != "") {
+    if (dept_commission == dept_service) {
+      matrice_dep[dept_commission, dept_commission] <- as.numeric(matrice_dep[dept_commission, dept_commission] + 1)
+    } else {
+      if (dept_commission %in% sorted_dep && dept_service %in% sorted_dep) {
+        matrice_dep[dept_service, dept_commission] <- as.numeric(matrice_dep[dept_service, dept_commission] + 1)
+      }
+    }
+  }
+})
+
+# Afficher la matrice
+print(matrice_dep)
