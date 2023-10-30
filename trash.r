@@ -65,3 +65,7 @@ create_matrix <- function(base) {
   }  
   return(matrice)
 }
+
+> dep.voi
+$`01`
+[1] "01" "38" "39" "69" "71" "73" "74"
