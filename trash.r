@@ -15,8 +15,12 @@ melted_df <- melt(combined_df, id.vars = c("Année", "type"))
 
 # Tracer le graphique combiné
 # Tracer le graphique combiné avec des améliorations visuelles
-ggplot(melted_df, aes(x = Année, y = value, color = variable, linetype = type)) +
+# Code existant...
+
+# Ajouter des étiquettes aux points de données
+ggplot(melted_df, aes(x = Année, y = value, color = variable, linetype = type, label = value)) +
   geom_line(size = 1.5) +
+  geom_text(aes(label = round(value, 2), vjust = -0.5), size = 3, show.legend = FALSE) + # Ajout des étiquettes
   labs(x = "Années", y = "Proportions", color = "Légende", linetype = "Type") +
   ggtitle("Titre du graphique combiné") +
   scale_color_manual(values = c(
@@ -32,9 +36,4 @@ ggplot(melted_df, aes(x = Année, y = value, color = variable, linetype = type))
         legend.title = element_text(size = 10, face = "bold"),
         legend.text = element_text(size = 9)) +
   facet_wrap(~type, ncol = 1, scales = "free_y") +
-  ylim(5, 16) +
-  annotate("text", x = 2010, y = 15, label = "Annotations personnalisées", size = 4, color = "black") +
-  annotate("rect", xmin = 2010, xmax = 2012, ymin = 5, ymax = 16, fill = "grey", alpha = 0.2) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-
-geom_text(vjust = -0.5, hjust = 0.5, size = 3) +
+  ylim(5, 16)
