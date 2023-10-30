@@ -69,3 +69,8 @@ create_matrix <- function(base) {
 > dep.voi
 $`01`
 [1] "01" "38" "39" "69" "71" "73" "74"
+
+dep.voi_df <- data.frame(
+  departement = rep(names(dep.voi), sapply(dep.voi, length)),
+  voisin = unlist(dep.voi)
+)
