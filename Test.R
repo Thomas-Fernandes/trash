@@ -166,3 +166,7 @@ df$Libelle_service <- map_chr(info, 2)
 df$INSEE_SIEGE_CIRCO_NOM_COM <- map_chr(info, 3)
 df$INSEE_SIEGE_CIRCO <- map_dbl(info, 4)
 df$CODE_DIR_RATTACH <- map_chr(info, 5)
+
+
+
+info <- mapply(get_matching_info, df$CODE_SERVICE, ifelse(df$CODE_SERVICE == "GN", df$CODE_SERVICE, NA), SIMPLIFY = FALSE)
