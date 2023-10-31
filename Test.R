@@ -49,3 +49,23 @@ df$Lieu_enr <- sapply(df$CODE_SERVICE, get_matching_communes)
 
 # Afficher le dataframe mis à jour
 print(df)
+
+
+
+
+get_matching_info <- function(code_service) {
+    if (code_service != "GN") {
+        rows <- which(df2$SRV_COD_DESCR_GENERIQUE == code_service)
+        if (length(rows) > 0) {
+            communes <- as.list(df2$INSEE_COMMUNE[rows])
+            libelle <- unique(df2$LIBELLE_SERVICE_ORUS_CSP[rows])
+            return(list(communes, libelle))
+        }
+    }
+    return(list(NA, NA))
+}
+
+# Appliquer la fonction pour chaque valeur de CODE_SERVICE dans df
+info <- map(df$CODE_SERVICE, get_matching_info)
+df$Lieu_enr <- map(info, 1)
+df$Libelle_service <- map_chr(info, 2)
