@@ -101,3 +101,26 @@ info <- map(df$CODE_SERVICE, get_matching_info)
 df$Lieu_enr <- map(info, 1)
 df$Libelle_service <- map_chr(info, 2)
 df$INSEE_SIEGE_CIRCO_NOM_COM <- map_chr(info, 3)
+
+
+
+
+
+
+
+
+
+
+get_matching_info <- function(code_service) {
+    if (code_service != "GN") {
+        rows <- which(df2$SRV_COD_DESCR_GENERIQUE == code_service)
+        if (length(rows) > 0) {
+            communes <- as.list(df2$INSEE_COMMUNE[rows])
+            libelle <- unique(df2$LIBELLE_SERVICE_ORUS_CSP[rows])
+            nom_com <- unique(df2$INSEE_SIEGE_CIRCO_NOM_COM[rows])
+            insee_siege_circo <- unique(df2$INSEE_SIEGE_CIRCO[rows])
+            return(list(communes, libelle, nom_com, insee_siege_circo))
+        }
+    }
+    return(list(NA, NA, NA, NA))
+}
