@@ -124,3 +124,45 @@ get_matching_info <- function(code_service) {
     }
     return(list(NA, NA, NA, NA))
 }
+
+
+
+
+
+
+
+
+
+
+get_matching_info <- function(code_service) {
+    if (code_service != "GN") {
+        rows <- which(df2$SRV_COD_DESCR_GENERIQUE == code_service)
+        if (length(rows) > 0) {
+            communes <- as.list(df2$INSEE_COMMUNE[rows])
+            libelle <- unique(df2$LIBELLE_SERVICE_ORUS_CSP[rows])
+            nom_com <- unique(df2$INSEE_SIEGE_CIRCO_NOM_COM[rows])
+            insee_siege_circo <- unique(df2$INSEE_SIEGE_CIRCO[rows])
+            return(list(communes, libelle, nom_com, insee_siege_circo, NA))
+        }
+    } else {
+        rows <- which(df2$CODE_DIR_RATTACH == df$CODE_SERVICE)
+        if (length(rows) > 0) {
+            communes <- as.list(df2$CODE_INSEE[rows])
+            libelle <- unique(df2$BTA_BP[rows])
+            nom_com <- unique(df2$ID_COMMUNE_IMPLANTATION_CIE[rows])
+            insee_siege_circo <- NA
+            code_dir_rattach <- unique(df2$CODE_DIR_RATTACH[rows])
+            return(list(communes, libelle, nom_com, insee_siege_circo, code_dir_rattach))
+        }
+    }
+    return(list(NA, NA, NA, NA, NA))
+}
+
+
+
+info <- map(df$CODE_SERVICE, get_matching_info)
+df$Lieu_enr <- map(info, 1)
+df$Libelle_service <- map_chr(info, 2)
+df$INSEE_SIEGE_CIRCO_NOM_COM <- map_chr(info, 3)
+df$INSEE_SIEGE_CIRCO <- map_dbl(info, 4)
+df$CODE_DIR_RATTACH <- map_chr(info, 5)
