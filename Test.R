@@ -221,3 +221,46 @@ df$Lieu_enr[df$CODE_SERVICE == "GN"] <- map(gn_info, 1)
 df$Libelle_service[df$CODE_SERVICE == "GN"] <- map_chr(gn_info, 2)
 df$INSEE_SIEGE_CIRCO_NOM_COM[df$CODE_SERVICE == "GN"] <- map_chr(gn_info, 3)
 df$INSEE_SIEGE_CIRCO[df$CODE_SERVICE == "GN"] <- map_dbl(gn_info, 4)
+
+
+
+
+
+
+
+
+
+
+# Création de nouvelles colonnes Lieu_enr, Libelle_service, INSEE_SIEGE_CIRCO_NOM_COM et INSEE_SIEGE_CIRCO dans df
+df$Lieu_enr <- NA
+df$Libelle_service <- NA
+df$INSEE_SIEGE_CIRCO_NOM_COM <- NA
+df$INSEE_SIEGE_CIRCO <- NA
+
+# Définir une fonction pour la recherche et l'insertion des valeurs
+get_matching_info <- function(code_service, code_dir_rattach) {
+    if (code_service != "GN") {
+        rows <- which(df2$SRV_COD_DESCR_GENERIQUE == code_service)
+        if (length(rows) > 0) {
+            communes <- as.list(df2$INSEE_COMMUNE[rows])
+            libelle <- unique(df2$LIBELLE_SERVICE_ORUS_CSP[rows])
+            nom_com <- unique(df2$INSEE_SIEGE_CIRCO_NOM_COM[rows])
+            insee_siege_circo <- unique(df2$INSEE_SIEGE_CIRCO[rows])
+            return(list(communes, libelle, nom_com, insee_siege_circo))
+        }
+    } else {
+        rows <- which(df2$CODE_DIR_RATTACH == code_dir_rattach)
+        if (length(rows) > 0) {
+            insee_siege_circo <- unique(df2$CU_BTA_BP[rows])
+            return(list(NA, NA, NA, insee_siege_circo))
+        }
+    }
+    return(list(NA, NA, NA, NA))
+}
+
+# Appliquer la fonction pour chaque valeur de CODE_SERVICE dans df
+info <- mapply(get_matching_info, df$CODE_SERVICE, df$CODE_DIR_RATTACH)
+df$Lieu_enr <- map(info, 1)
+df$Libelle_service <- map_chr(info, 2)
+df$INSEE_SIEGE_CIRCO_NOM_COM <- map_chr(info, 3)
+df$INSEE_SIEGE_CIRCO <- map_dbl(info, 4)
