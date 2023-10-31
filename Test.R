@@ -28,3 +28,24 @@ for (i in 1:nrow(df)) {
   # Insérer la liste dans la ligne correspondante de df, à la colonne Lieu_enr
   df$Lieu_enr[i] <- paste(liste_communes, collapse = ", ")
 }
+
+
+
+# Création d'une nouvelle colonne Lieu_enr dans df
+df$Lieu_enr <- NA
+
+# Définir une fonction pour la recherche et l'insertion des valeurs
+get_matching_communes <- function(code_service) {
+    rows <- which(df2$SRV_COD_DESCR_GENERIQUE == code_service)
+    if (length(rows) > 0) {
+        return(paste(df2$INSEE_COMMUNE[rows], collapse = ", "))
+    } else {
+        return(NA)
+    }
+}
+
+# Appliquer la fonction pour chaque valeur de CODE_SERVICE dans df
+df$Lieu_enr <- sapply(df$CODE_SERVICE, get_matching_communes)
+
+# Afficher le dataframe mis à jour
+print(df)
