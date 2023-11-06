@@ -304,17 +304,12 @@ find_circonscription_libelle <- function(insee_commission, code_service, csp_gn,
   }
   return(list(circonscription = circonscription, libelle = libelle))
 }
+results <- mapply(find_circonscription, 
+                  base_infractions_2016$INSEE_COMMISSION_2016, 
+                  base_infractions_2016$CODE_SERVICE, 
+                  MoreArgs = list(csp_gn = CSP_GN, csp_pn = CSP_PN),
+                  SIMPLIFY = FALSE)  # Conserver le résultat sous forme de liste
 
-# Appliquer la fonction sur chaque ligne du dataframe base_infractions_2016 et créer deux nouvelles colonnes
-base_infractions_2016 <- cbind(base_infractions_2016, t(mapply(find_circonscription_libelle, 
-                                                                base_infractions_2016$INSEE_COMMISSION_2016, 
-                                                                base_infractions_2016$CODE_SERVICE, 
-                                                                MoreArgs = list(csp_gn = CSP_GN, csp_pn = CSP_PN),
-                                                                SIMPLIFY = FALSE)))
-
-# Renommer les colonnes ajoutées
-names(base_infractions_2016)[ncol(base_infractions_2016)-1] <- "circonscription"
-names(base_infractions_2016)[ncol(base_infractions_2016)] <- "libelle_circonscription"
-
-# Afficher les premières lignes pour vérifier
-head(base_infractions_2016)
+# Création des colonnes circonscription et libellé_circonscription
+base_infractions_2016$circonscription <- sapply(results, `[[`, "circonscription")
+base_infractions_2016$libelle_circonscription <- sapply(results, `[[`, "libelle")
