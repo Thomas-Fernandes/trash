@@ -293,8 +293,8 @@ df$INSEE_SIEGE_CIRCO <- map_dbl(info, 4)
 
 
 
-# Fonction pour trouver la circonscription et son libellé sans utiliser d'index
-find_circonscription_libelle <- function(insee_commission, code_service, csp_gn, csp_pn) {
+# Fonction ajustée pour renvoyer directement les valeurs de la circonscription et du libellé
+find_circonscription <- function(insee_commission, code_service, csp_gn, csp_pn) {
   if (code_service == "GN") {
     circonscription <- csp_gn$CU_CIE[match(insee_commission, csp_gn$CODE_INSEE)]
     libelle <- csp_gn$CIE[match(insee_commission, csp_gn$CODE_INSEE)]
@@ -304,6 +304,8 @@ find_circonscription_libelle <- function(insee_commission, code_service, csp_gn,
   }
   return(list(circonscription = circonscription, libelle = libelle))
 }
+
+# Appliquer la fonction avec mapply et créer directement deux nouvelles colonnes
 results <- mapply(find_circonscription, 
                   base_infractions_2016$INSEE_COMMISSION_2016, 
                   base_infractions_2016$CODE_SERVICE, 
