@@ -279,3 +279,42 @@ df$Lieu_enr <- map(info, 1)
 df$Libelle_service <- map_chr(info, 2)
 df$INSEE_SIEGE_CIRCO_NOM_COM <- map_chr(info, 3)
 df$INSEE_SIEGE_CIRCO <- map_dbl(info, 4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Fonction pour trouver la circonscription et son libellé sans utiliser d'index
+find_circonscription_libelle <- function(insee_commission, code_service, csp_gn, csp_pn) {
+  if (code_service == "GN") {
+    circonscription <- csp_gn$CU_CIE[match(insee_commission, csp_gn$CODE_INSEE)]
+    libelle <- csp_gn$CIE[match(insee_commission, csp_gn$CODE_INSEE)]
+  } else {
+    circonscription <- csp_pn$INSEE_SIEGE_CIRCO[match(insee_commission, csp_pn$INSEE_COMMUNE)]
+    libelle <- csp_pn$INSEE_SIEGE_CIRCO_NOM_COM[match(insee_commission, csp_pn$INSEE_COMMUNE)]
+  }
+  return(list(circonscription = circonscription, libelle = libelle))
+}
+
+# Appliquer la fonction sur chaque ligne du dataframe base_infractions_2016 et créer deux nouvelles colonnes
+base_infractions_2016 <- cbind(base_infractions_2016, t(mapply(find_circonscription_libelle, 
+                                                                base_infractions_2016$INSEE_COMMISSION_2016, 
+                                                                base_infractions_2016$CODE_SERVICE, 
+                                                                MoreArgs = list(csp_gn = CSP_GN, csp_pn = CSP_PN),
+                                                                SIMPLIFY = FALSE)))
+
+# Renommer les colonnes ajoutées
+names(base_infractions_2016)[ncol(base_infractions_2016)-1] <- "circonscription"
+names(base_infractions_2016)[ncol(base_infractions_2016)] <- "libelle_circonscription"
+
+# Afficher les premières lignes pour vérifier
+head(base_infractions_2016)
