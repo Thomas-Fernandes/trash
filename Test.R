@@ -224,6 +224,21 @@ df$INSEE_SIEGE_CIRCO[df$CODE_SERVICE == "GN"] <- map_dbl(gn_info, 4)
 
 
 
+# Fonction pour trouver la circonscription
+find_circonscription <- function(insee_commission, code_service, csp_gn, csp_pn) {
+  if (code_service == "GN") {
+    circonscription <- csp_gn$CU_CIE[match(insee_commission, csp_gn$CODE_INSEE)]
+  } else {
+    circonscription <- csp_pn$INSEE_SIEGE_CIRCO[match(insee_commission, csp_pn$INSEE_COMMUNE)]
+  }
+  return(circonscription)
+}
+
+# Appliquer la fonction sur chaque ligne du dataframe base_infractions_2016
+base_infractions_2016$circonscription <- mapply(find_circonscription, 
+                                                 base_infractions_2016$INSEE_COMMISSION_2016, 
+                                                 base_infractions_2016$CODE_SERVICE, 
+                                                 MoreArgs = list(csp_gn = CSP_GN, csp_pn = CSP_PN))
 
 
 
