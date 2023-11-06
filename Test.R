@@ -299,13 +299,56 @@ find_circonscription <- function(insee_commission, code_service, csp_gn, csp_pn)
     circonscription <- csp_gn$CU_CIE[match(insee_commission, csp_gn$CODE_INSEE)]
     libelle <- csp_gn$CIE[match(insee_commission, csp_gn$CODE_INSEE)]
   } else {
-    circonscription <- csp_pn$INSEE_SIEGE_CIRCO[match(insee_commission, csp_pn$INSEE_COMMUNE)]
-    libelle <- csp_pn$INSEE_SIEGE_CIRCO_NOM_COM[match(insee_commission, csp_pn$INSEE_COMMUNE)]
+    if (ZPN_ZGN == "ZPN") {
+        circonscription <- csp_pn$INSEE_SIEGE_CIRCO[match(insee_commission, csp_pn$INSEE_COMMUNE)]
+        libelle <- csp_pn$INSEE_SIEGE_CIRCO_NOM_COM[match(insee_commission, csp_pn$INSEE_COMMUNE)]
+    } else {
+        circonscription <- csp_gn$CU_CIE[match(insee_commission, csp_gn$CODE_INSEE)]
+        libelle <- csp_gn$CIE[match(insee_commission, csp_gn$CODE_INSEE)]
+    }
   }
   return(list(circonscription = circonscription, libelle = libelle))
 }
 
 # Appliquer la fonction avec mapply et créer directement deux nouvelles colonnes
+results <- mapply(find_circonscription, 
+                  base_infractions_2016$INSEE_COMMISSION_2016, 
+                  base_infractions_2016$CODE_SERVICE, 
+                  MoreArgs = list(csp_gn = CSP_GN, csp_pn = CSP_PN),
+                  SIMPLIFY = FALSE)  # Conserver le résultat sous forme de liste
+
+# Création des colonnes circonscription et libellé_circonscription
+base_infractions_2016$circonscription <- sapply(results, `[[`, "circonscription")
+base_infractions_2016$libelle_circonscription <- sapply(results, `[[`, "libelle")
+
+
+
+
+
+
+
+
+
+
+find_circonscription <- function(insee_commission, code_service, csp_gn, csp_pn) {
+  if (code_service == "GN") {
+    circonscription <- csp_gn$CU_CIE[match(insee_commission, csp_gn$CODE_INSEE)]
+    libelle <- csp_gn$CIE[match(insee_commission, csp_gn$CODE_INSEE)]
+  } else {
+    index_pn <- match(insee_commission, csp_pn$INSEE_COMMUNE)
+    if (!is.na(index_pn)) {
+      circonscription <- csp_pn$INSEE_SIEGE_CIRCO[index_pn]
+      libelle <- csp_pn$INSEE_SIEGE_CIRCO_NOM_COM[index_pn]
+    } else {
+      index_gn <- match(insee_commission, csp_gn$CODE_INSEE)
+      circonscription <- if(!is.na(index_gn)) csp_gn$CU_CIE[index_gn] else NA
+      libelle <- if(!is.na(index_gn)) csp_gn$CIE[index_gn] else NA
+    }
+  }
+  return(list(circonscription = circonscription, libelle = libelle))
+}
+
+# Utilisation de la fonction modifiée pour mettre à jour le dataframe
 results <- mapply(find_circonscription, 
                   base_infractions_2016$INSEE_COMMISSION_2016, 
                   base_infractions_2016$CODE_SERVICE, 
